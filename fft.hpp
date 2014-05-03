@@ -23,6 +23,7 @@
 
 #include <complex>
 #include <array>
+#include <cmath>
 
 /// \brief FFT - discrete Fourier transforms
 /// \author David Turnbull
@@ -52,13 +53,39 @@
 
 namespace FFT {
     
+    /// Computes and caches twiddle factors.
+    template<typename T, size_t N, int D>
+    struct Twiddle4 {
+        static std::array<std::complex<T>, N> t1;
+        static std::array<std::complex<T>, N> t2;
+        static std::array<std::complex<T>, N> t3;
+        Twiddle4() {
+            // Initialize values on first instance.
+            if (!t1[0].real()) {
+                T theta = M_PI*2*D/(N*4);
+                for (size_t i=0; i < N; ++i) {
+                    T phi = i*theta;
+                    t1[i] = std::complex<T>(cos(phi), sin(phi));
+                    t2[i] = std::complex<T>(cos(phi*2), sin(phi*2));
+                    t3[i] = std::complex<T>(cos(phi*3), sin(phi*3));
+                }
+            }
+        }
+    };
+
+    // Storage for twiddle factors
+    template<typename T, size_t N, int D>
+    std::array<std::complex<T>, N> Twiddle4<T, N, D>::t1 {0};
+    template<typename T, size_t N, int D>
+    std::array<std::complex<T>, N> Twiddle4<T, N, D>::t2;
+    template<typename T, size_t N, int D>
+    std::array<std::complex<T>, N> Twiddle4<T, N, D>::t3;
+    
     /// Recursive template for mixing.
     template<typename T, size_t N, int D>
     class Radix4 {
-        static std::array<std::complex<T>, N/4> t1;
-        static std::array<std::complex<T>, N/4> t2;
-        static std::array<std::complex<T>, N/4> t3;
         static const size_t N4 = N/4;
+        const struct Twiddle4<T, N4, D> t;
         Radix4<T, N4, D> next;
         /// Limited range (fast) multiplication of complex numbers.
         static inline std::complex<T> multiply(const std::complex<T>& z, const std::complex<T>& w)
@@ -75,33 +102,22 @@ namespace FFT {
             T y = ad + bc;
             return std::complex<T>(x, y);
         }
+        /// Simplified multiplication for direction product.
         static inline std::complex<T> direction(const std::complex<T>& z)
         {
             if (D>0) return std::complex<T>(-z.imag(), z.real());
             else return std::complex<T>(z.imag(), -z.real());
         }
     public:
-        Radix4() {
-            // Initialize twiddle factors on first instance.
-            if (!t1[0].real()) {
-                T theta = M_PI*2*D/N;
-                for (size_t i=0; i < N4; ++i) {
-                    T phi = i*theta;
-                    t1[i] = std::complex<T>(cos(phi), sin(phi));
-                    t2[i] = std::complex<T>(cos(phi*2), sin(phi*2));
-                    t3[i] = std::complex<T>(cos(phi*3), sin(phi*3));
-                }
-            }
-        }
         void mix(std::complex<T>* data) {
-            next.mix(data);
-            next.mix(data+N4);
-            next.mix(data+N4*2);
-            next.mix(data+N4*3);
-            // Index 0 twiddles are always (1+0i).
             size_t i1 = N4;
             size_t i2 = N4 + N4;
             size_t i3 = i2 + N4;
+            next.mix(data);
+            next.mix(data+i1);
+            next.mix(data+i2);
+            next.mix(data+i3);
+            // Index 0 twiddles are always (1+0i).
             std::complex<T> a0 = data[0];
             std::complex<T> a1 = data[i2];
             std::complex<T> a2 = data[i1];
@@ -114,16 +130,16 @@ namespace FFT {
             data[i3] = a0 - a2 - b1;
             // Index 1+ must multiply twiddles.
             for (size_t i0=1; i0 < N4; ++i0) {
-                size_t i1 = i0 + N4;
-                size_t i2 = i1 + N4;
-                size_t i3 = i2 + N4;
+                i1 = i0 + N4;
+                i2 = i1 + N4;
+                i3 = i2 + N4;
                 std::complex<T> a0 = data[i0];
                 std::complex<T> a1 = data[i2];
                 std::complex<T> a2 = data[i1];
                 std::complex<T> a3 = data[i3];
-                a1 = multiply(a1, t1[i0]);
-                a2 = multiply(a2, t2[i0]);
-                a3 = multiply(a3, t3[i0]);
+                a1 = multiply(a1, t.t1[i0]);
+                a2 = multiply(a2, t.t2[i0]);
+                a3 = multiply(a3, t.t3[i0]);
                 std::complex<T> b0 = (a1+a3);
                 std::complex<T> b1 = direction(a1-a3);
                 data[i0] = a0 + a2 + b0;
@@ -133,14 +149,6 @@ namespace FFT {
             }
         }
     };
-    
-    // Storage for twiddle factors
-    template<typename T, size_t N, int D>
-    std::array<std::complex<T>, N/4> Radix4<T, N, D>::t1 {0};
-    template<typename T, size_t N, int D>
-    std::array<std::complex<T>, N/4> Radix4<T, N, D>::t2;
-    template<typename T, size_t N, int D>
-    std::array<std::complex<T>, N/4> Radix4<T, N, D>::t3;
     
     /// Terminates template recursion for powers of 2.
     template<typename T, int D>

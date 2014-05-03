@@ -1,6 +1,6 @@
 # Optimizing with C++11 templates
 
-This code demonstrates uses recursive C++11 templates to improve
+This code demonstrates using recursive C++11 templates to improve
 performance of the Cooley-Tukey algorithm for FFT. First, the
 classical code is updated to use basic C++11 features. This makes
 things simpler and easier to understand. Next, we convert the

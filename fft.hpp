@@ -94,13 +94,7 @@ namespace FFT {
             T b = z.imag();
             T c = w.real();
             T d = w.imag();
-            T ac = a * c;
-            T bd = b * d;
-            T ad = a * d;
-            T bc = b * c;
-            T x = ac - bd;
-            T y = ad + bc;
-            return std::complex<T>(x, y);
+            return std::complex<T>(a*c - b*d, a*d + b*c);
         }
         /// Simplified multiplication for direction product.
         static inline std::complex<T> direction(const std::complex<T>& z)
@@ -133,15 +127,12 @@ namespace FFT {
                 i1 = i0 + N4;
                 i2 = i1 + N4;
                 i3 = i2 + N4;
-                std::complex<T> a0 = data[i0];
-                std::complex<T> a1 = data[i2];
-                std::complex<T> a2 = data[i1];
-                std::complex<T> a3 = data[i3];
-                a1 = multiply(a1, t.t1[i0]);
-                a2 = multiply(a2, t.t2[i0]);
-                a3 = multiply(a3, t.t3[i0]);
-                std::complex<T> b0 = (a1+a3);
-                std::complex<T> b1 = direction(a1-a3);
+                a0 = data[i0];
+                a1 = multiply(data[i2], t.t1[i0]);
+                a2 = multiply(data[i1], t.t2[i0]);
+                a3 = multiply(data[i3], t.t3[i0]);
+                b0 = (a1+a3);
+                b1 = direction(a1-a3);
                 data[i0] = a0 + a2 + b0;
                 data[i1] = a0 - a2 + b1;
                 data[i2] = a0 + a2 - b0;

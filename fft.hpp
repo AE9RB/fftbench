@@ -165,6 +165,7 @@ namespace FFT {
     /// Initiates a transform.
     template<typename T, size_t N>
     class FFT {
+        static_assert((N > 1) & !(N & (N - 1)), "Array size must be a power of two.");
         static void reindex(std::array<std::complex<T>, N> &data) {
             for (size_t i=0, j=0; i<N; ++i) {
                 if (j>i) {
@@ -189,30 +190,23 @@ namespace FFT {
                 j += m;
             }
         }
-        static void validate_template() {
-            static_assert((N > 1) & !(N & (N - 1)), "Array size must be a power of two.");
-        }
     public:
         static void dft(std::array<std::complex<T>, N> &data) {
-            validate_template();
             Radix4<T, N, -1> mixer;
             reindex(data);
             mixer.mix(&data[0]);
         }
         static void dft(const std::array<std::complex<T>, N> &in, std::array<std::complex<T>, N> &out) {
-            validate_template();
             Radix4<T, N, -1> mixer;
             reindex(in, out);
             mixer.mix(&out[0]);
         }
         static void idft(std::array<std::complex<T>, N> &data) {
-            validate_template();
             Radix4<T, N, 1> mixer;
             reindex(data);
             mixer.mix(&data[0]);
         }
         static void idft(const std::array<std::complex<T>, N> &in, std::array<std::complex<T>, N> &out) {
-            validate_template();
             Radix4<T, N, 1> mixer;
             reindex(in, out);
             mixer.mix(&out[0]);

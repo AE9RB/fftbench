@@ -57,8 +57,7 @@ BENCHMARK_F(Float8192, four1plus, 100, 1) {
 }
 
 BENCHMARK_F(Float8192, four1tmpl, 100, 1) {
-    Four1tmpl<std::complex<float>, 8192> fft;
-    fft.fft(data);
+    Four1tmpl<std::complex<float>, 8192>::fft(data);
 }
 
 BENCHMARK_F(Float8192, fft, 100, 1) {

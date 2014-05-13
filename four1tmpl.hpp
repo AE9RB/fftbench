@@ -4,12 +4,11 @@
 #define fftbench_four1tmpl_hpp
 
 template<typename T, size_t N>
-class Four1tmplMixer {
-    typedef typename T::value_type fp_type;
+class Radix2 {
     static const size_t N2 = N/2;
-    Four1tmplMixer<T, N2> next;
+    Radix2<T, N2> next;
 public:
-    // Danielson-Lanczos mixer
+    // Danielson-Lanczos
     void mix(T* data) {
         next.mix(data);
         next.mix(data+N2);
@@ -26,7 +25,7 @@ public:
 };
 
 template<typename T>
-class Four1tmplMixer<T, 1> {
+class Radix2<T, 1> {
 public:
     void mix(T* data) {
     }
@@ -34,7 +33,7 @@ public:
 
 template<typename T, size_t N>
 class Four1tmpl {
-    Four1tmplMixer<T, N> mixer;
+    static_assert((N > 1) & !(N & (N - 1)), "Array size must be a power of two.");
     // reverse-binary reindexer
     static void reindex(std::array<T, N> &data) {
         for (size_t i=0, j=0; i<N; ++i) {
@@ -50,8 +49,8 @@ class Four1tmpl {
         }
     }
 public:
-    void fft(std::array<T, N> &data) {
-        static_assert((N > 1) & !(N & (N - 1)), "Array size must be a power of two.");
+    static void fft(std::array<T, N> &data) {
+        Radix2<T, N> mixer;
         reindex(data);
         mixer.mix(&data[0]);
     }

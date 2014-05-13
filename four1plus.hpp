@@ -6,7 +6,6 @@
 
 template<typename T, size_t N>
 void four1plus(std::array<T, N> &data) {
-    typedef typename T::value_type fp_type;
     static_assert((N > 1) & !(N & (N - 1)), "Array size must be a power of two.");
     // reverse-binary reindexing
     for (size_t i=0, j=0; i<N; ++i) {

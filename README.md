@@ -15,35 +15,32 @@ from radix 2 to radix 4 and apply various optimizations.
 C++11 compilers use ISO rules for std::complex multiplication and division.
 The extra checking for (nan,nan) results cause a significant performance
 problem. Because this is not needed for DSP applications, the multiplication
-and division operators in ::std are replaced with limited range versions.
+and division operators in ::std can be replaced with limited range versions.
 This is done to ease the development process and becomes unnecessary in
 the final fft.hpp code which uses its own multiply() method.
 
- * cxlr.hpp - Changes std::complex multiplication and division.
+ * cxlr.hpp - Changes std::complex multiplication.
 
-Benchmarking is done with a modified hayai library. Everything is included
-in this repository and there is only one file to compile. No makefile is
-used, simply compile and run with:
+Everything is included in this repository and there is only one file to
+compile. No makefile is used, simply compile and run with:
 
 ```g++ -o bench -std=c++11 -O3 main.cpp && ./bench```
 
 Example output from GCC 4.9:
 
 ```
-[==========] Running 4 benchmarks.
-[ RUN      ] Float8192.four1 (100 runs, 1 iteration per run)
-[     DONE ] Float8192.four1 (54.876165 ms)
-[          ] Fastest time: 499.402 us
-[ RUN      ] Float8192.four1plus (100 runs, 1 iteration per run)
-[     DONE ] Float8192.four1plus (53.903960 ms)
-[          ] Fastest time: 496.474 us
-[ RUN      ] Float8192.four1tmpl (100 runs, 1 iteration per run)
-[     DONE ] Float8192.four1tmpl (39.398755 ms)
-[          ] Fastest time: 319.323 us
-[ RUN      ] Float8192.fft (100 runs, 1 iteration per run)
-[     DONE ] Float8192.fft (18.977589 ms)
-[          ] Fastest time: 166.194 us
-[==========] Ran 4 benchmarks.
+[ RUN      ] FFTfixture<float>.four1
+[   TIME   ] 27 iterations, 504.25 us
+[       OK ] FFTfixture<float>.four1 (13 ms)
+[ RUN      ] FFTfixture<float>.four1plus
+[   TIME   ] 21 iterations, 504.75 us
+[       OK ] FFTfixture<float>.four1plus (10 ms)
+[ RUN      ] FFTfixture<float>.four1tmpl
+[   TIME   ] 22 iterations, 324.333 us
+[       OK ] FFTfixture<float>.four1tmpl (11 ms)
+[ RUN      ] FFTfixture<float>.fft
+[   TIME   ] 24 iterations, 169.917 us
+[       OK ] FFTfixture<float>.fft (8 ms)
 ```
 
 ## License
@@ -54,7 +51,9 @@ four1.hpp example, is presented here under fair use. Depending on how
 you plan to use this project, you may be required to obtain permission
 with the following two exceptions:
 
-The hayai library is open source. You may obtain an unmodified version
-from: https://github.com/nickbruun/hayai
+The benchtest library is a snapshot from my dspp project. If you want to
+try it in your project, it is best to get from there:
+https://github.com/AE9RB/dspp
 
-The fft.hpp file is MIT licensed.
+The fft.hpp file is MIT licensed. License and documentation are in the file.
+Simply copy it to your project. It has no dependencies and won't be updated.

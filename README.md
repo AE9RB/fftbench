@@ -56,4 +56,4 @@ try it in your project, it is best to get from there:
 https://github.com/AE9RB/dspp
 
 The fft.hpp file is MIT licensed. License and documentation are in the file.
-Simply copy it to your project. It has no dependencies and won't be updated.
+Simply copy it to your project. It has no dependencies.

@@ -97,7 +97,7 @@ namespace FFT {
             else return std::complex<T>(z.imag(), -z.real());
         }
         // Fast multiplication (bypass NaN checking)
-        static std::complex<T> mul(const std::complex<T>& z, const std::complex<T>& w)
+        static std::complex<T> multiply(const std::complex<T>& z, const std::complex<T>& w)
         {
             return std::complex<T>(
                        z.real()*w.real() - z.imag()*w.imag(),
@@ -131,9 +131,9 @@ namespace FFT {
                 i2 = i1 + N4;
                 i3 = i2 + N4;
                 a0 = data[i0];
-                a2 = mul(data[i1], twiddle.t2[i0]);
-                a1 = mul(data[i2], twiddle.t1[i0]);
-                a3 = mul(data[i3], twiddle.t3[i0]);
+                a2 = multiply(data[i1], twiddle.t2[i0]);
+                a1 = multiply(data[i2], twiddle.t1[i0]);
+                a3 = multiply(data[i3], twiddle.t3[i0]);
                 b0 = a1 + a3;
                 b1 = direction(a1-a3);
                 data[i0] = a0 + a2 + b0;

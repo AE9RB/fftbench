@@ -39,7 +39,7 @@ Example output from GCC 4.9:
 [   TIME   ] 22 iterations, 324.333 us
 [       OK ] FFTfixture<float>.four1tmpl (11 ms)
 [ RUN      ] FFTfixture<float>.fft
-[   TIME   ] 24 iterations, 169.917 us
+[   TIME   ] 24 iterations, 132.167 us
 [       OK ] FFTfixture<float>.fft (8 ms)
 ```
 
